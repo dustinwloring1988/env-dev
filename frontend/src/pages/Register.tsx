@@ -1,0 +1,82 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authApi } from '../services/api';
+import { useAuthStore } from '../context/store';
+import { Input, Button, Card } from '../components';
+
+export const Register: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { setAuth } = useAuthStore();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await authApi.register(email, password);
+      const { user, accessToken, refreshToken } = response.data;
+      setAuth(user, accessToken, refreshToken);
+      navigate('/');
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { error?: { message?: string } } } };
+      setError(axiosError.response?.data?.error?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: '400px', margin: '4rem auto' }}>
+      <Card>
+        <h1 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Register</h1>
+        <form onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <Input
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Input
+            label="Confirm Password"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          {error && (
+            <p style={{ color: '#ef4444', marginBottom: '1rem' }}>{error}</p>
+          )}
+          <Button type="submit" loading={loading} style={{ width: '100%' }}>
+            Register
+          </Button>
+        </form>
+        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: '#2563eb' }}>
+            Login
+          </Link>
+        </p>
+      </Card>
+    </div>
+  );
+};

@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  apps      App[]
+}
+
+model App {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  apiKey      String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secrets     Secret[]
+}
+
+model Secret {
+  id        String   @id @default(uuid())
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  appId     String
+  app       App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@unique([appId, key])
+}
