@@ -45,6 +45,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {isAuthenticated && user ? (
               <>
+                <Link to="/users" style={{ color: '#2563eb', textDecoration: 'none' }}>
+                  Users
+                </Link>
                 <span style={{ color: '#6b7280' }}>{user.email}</span>
                 <button
                   onClick={handleLogout}

@@ -36,3 +36,22 @@ docker compose up -d --build
 - SQLite file: `backend/prisma/dev.db`
 - Models: User, App, Secret
 - Secrets encrypted with AES-256-GCM
+
+### Database Migrations (IMPORTANT!)
+**After ANY changes to `backend/prisma/schema.prisma`, you MUST run migrations in Docker:**
+
+```bash
+# If containers are already running:
+docker compose -f docker-compose.dev.yml exec backend npx prisma migrate deploy
+
+# Or restart containers to auto-apply migrations:
+docker compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml up -d
+
+# For new migrations (when changing schema):
+cd backend
+npm run prisma:migrate -- --name your_migration_name
+docker compose -f docker-compose.dev.yml exec backend npx prisma migrate deploy
+```
+
+**Note:** The Docker container uses a separate SQLite database file than local development. Changes made locally won't apply to the Docker database unless you run migrations inside the container.

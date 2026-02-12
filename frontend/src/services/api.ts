@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type {
   AuthResponse,
+  UsersResponse,
+  UserResponse,
   AppsResponse,
   AppResponse,
   SecretsResponse,
@@ -71,6 +73,8 @@ export const appApi = {
   deleteApp: (id: string) => api.delete(`/apps/${id}`),
   regenerateKey: (id: string) =>
     api.post<AppResponse>(`/apps/${id}/regenerate-key`),
+  toggleRequireAuth: (id: string, requireAuth: boolean) =>
+    api.put<AppResponse>(`/apps/${id}/require-auth`, { requireAuth }),
 };
 
 export const secretApi = {
@@ -84,6 +88,14 @@ export const secretApi = {
     api.put<SecretResponse>(`/apps/${appId}/secrets/${key}`, data),
   deleteSecret: (appId: string, key: string) =>
     api.delete(`/apps/${appId}/secrets/${key}`),
+};
+
+export const userApi = {
+  getUsers: () => api.get<UsersResponse>('/users'),
+  getUser: (id: string) => api.get<UserResponse>(`/users/${id}`),
+  updateUserRole: (id: string, role: string) =>
+    api.put<UserResponse>(`/users/${id}/role`, { role }),
+  deleteUser: (id: string) => api.delete(`/users/${id}`),
 };
 
 export default api;

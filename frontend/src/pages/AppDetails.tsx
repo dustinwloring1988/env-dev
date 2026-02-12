@@ -22,6 +22,7 @@ export const AppDetails: React.FC = () => {
   const [editKey, setEditKey] = useState('');
   const [editValue, setEditValue] = useState('');
   const [savingSecret, setSavingSecret] = useState(false);
+  const [togglingAuth, setTogglingAuth] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -121,6 +122,21 @@ export const AppDetails: React.FC = () => {
     }
   };
 
+  const handleToggleRequireAuth = async () => {
+    if (!id || !currentApp) return;
+
+    setTogglingAuth(true);
+    try {
+      const response = await appApi.toggleRequireAuth(id, !currentApp.requireAuth);
+      setCurrentApp(response.data.app);
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { error?: string } } };
+      setError(axiosError.response?.data?.error || 'Failed to toggle auth requirement');
+    } finally {
+      setTogglingAuth(false);
+    }
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -174,6 +190,26 @@ export const AppDetails: React.FC = () => {
               {showApiKey ? 'Hide' : 'Show'}
             </Button>
           </div>
+        </div>
+      </Card>
+
+      <Card style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ marginBottom: '0.25rem' }}>Authentication</h2>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+              {currentApp.requireAuth 
+                ? 'Authentication is required for this app' 
+                : 'Authentication is not required - app is publicly accessible'}
+            </p>
+          </div>
+          <Button 
+            variant={currentApp.requireAuth ? "danger" : "primary"} 
+            onClick={handleToggleRequireAuth}
+            loading={togglingAuth}
+          >
+            {currentApp.requireAuth ? 'Disable Auth' : 'Enable Auth'}
+          </Button>
         </div>
       </Card>
 

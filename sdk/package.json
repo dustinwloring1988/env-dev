@@ -1,0 +1,44 @@
+{
+  "name": "env-dev-sdk",
+  "version": "0.1.1",
+  "description": "TypeScript SDK for env-dev secret management",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs && node -e \"const fs=require('fs'),path=require('path');fs.readdirSync('dist/cjs').forEach(f=>{if(f.endsWith('.js'))fs.copyFileSync(path.join('dist/cjs',f),path.join('dist',f))})\"",
+    "build:esm": "tsc --module esnext --moduleResolution node --outDir dist/esm && node -e \"const fs=require('fs'),path=require('path');fs.readdirSync('dist/esm').forEach(f=>{const ext=f.endsWith('.js')?'.mjs':'';if(ext)fs.copyFileSync(path.join('dist/esm',f),path.join('dist',f.replace('.js',ext)))})\"",
+    "build:types": "tsc --declaration --emitDeclarationOnly --moduleResolution node --outDir dist && npx rimraf dist/cjs dist/esm",
+    "clean": "npx rimraf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "secrets",
+    "environment",
+    "configuration",
+    "sdk",
+    "typescript"
+  ],
+  "author": "dustin <dloring1988@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

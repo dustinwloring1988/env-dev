@@ -20,7 +20,7 @@ export const Dashboard: React.FC = () => {
     if (!isAuthenticated) {
       const token = localStorage.getItem('accessToken');
       if (token) {
-        setUser({ id: '', email: '', createdAt: '' });
+        setUser({ id: '', email: '', role: 'user', createdAt: '' });
       } else {
         navigate('/login');
       }

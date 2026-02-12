@@ -2,3 +2,4 @@ export { Login } from './Login';
 export { Register } from './Register';
 export { Dashboard } from './Dashboard';
 export { AppDetails } from './AppDetails';
+export { Users } from './Users';

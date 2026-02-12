@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components';
-import { Login, Register, Dashboard, AppDetails } from './pages';
+import { Login, Register, Dashboard, AppDetails, Users } from './pages';
 import { useAuthStore } from './context/store';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -51,6 +51,14 @@ export const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <AppDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Users />
               </ProtectedRoute>
             }
           />

@@ -1,7 +1,12 @@
 export interface User {
   id: string;
   email: string;
+  role: string;
   createdAt: string;
+  updatedAt?: string;
+  _count?: {
+    apps: number;
+  };
 }
 
 export interface App {
@@ -9,6 +14,7 @@ export interface App {
   name: string;
   description: string | null;
   apiKey: string;
+  requireAuth: boolean;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -29,6 +35,14 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+export interface UsersResponse {
+  users: User[];
+}
+
+export interface UserResponse {
+  user: User;
 }
 
 export interface AppsResponse {

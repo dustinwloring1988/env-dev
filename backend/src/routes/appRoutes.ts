@@ -12,5 +12,6 @@ router.get('/:id', appController.getApp);
 router.put('/:id', appController.updateApp);
 router.delete('/:id', appController.deleteApp);
 router.post('/:id/regenerate-key', appController.regenerateApiKey);
+router.put('/:id/require-auth', appController.toggleRequireAuth);
 
 export default router;

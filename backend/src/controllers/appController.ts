@@ -36,6 +36,7 @@ export const getApp = asyncHandler(async (req: Request, res: Response) => {
       name: true,
       description: true,
       apiKey: true,
+      requireAuth: true,
       createdAt: true,
       updatedAt: true,
       secrets: {
@@ -145,6 +146,39 @@ export const regenerateApiKey = asyncHandler(async (req: Request, res: Response)
       id: true,
       name: true,
       apiKey: true,
+    },
+  });
+  
+  res.json({ app: updated });
+});
+
+export const toggleRequireAuth = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { requireAuth } = req.body;
+  
+  if (typeof requireAuth !== 'boolean') {
+    return res.status(400).json({ error: 'requireAuth must be a boolean' });
+  }
+  
+  const app = await prisma.app.findFirst({
+    where: { id, userId: req.user!.userId },
+  });
+  
+  if (!app) {
+    return res.status(404).json({ error: 'App not found' });
+  }
+  
+  const updated = await prisma.app.update({
+    where: { id },
+    data: { requireAuth },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      apiKey: true,
+      requireAuth: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
   
