@@ -1,57 +1,17 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import type { User, App } from '../types';
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
-  clearAuth: () => void;
-  updateUser: (user: User) => void;
+  setUser: (user: User | null) => void;
 }
 
-const STORAGE_KEY = 'auth-storage';
-
-const createAuthStore = () =>
-  create<AuthState>()(
-    persist(
-      (set) => ({
-        user: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-        setAuth: (user, accessToken, refreshToken) => {
-          const state = { user, accessToken, refreshToken, isAuthenticated: true };
-          set(state);
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-          } catch {}
-        },
-        clearAuth: () => {
-          const state = { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
-          set(state);
-          try {
-            localStorage.removeItem(STORAGE_KEY);
-          } catch {}
-        },
-        updateUser: (user) => set({ user }),
-      }),
-      {
-        name: STORAGE_KEY,
-        storage: createJSONStorage(() => localStorage),
-        partialize: (state) => ({
-          user: state.user,
-          accessToken: state.accessToken,
-          refreshToken: state.refreshToken,
-          isAuthenticated: state.isAuthenticated,
-        }),
-      }
-    )
-  );
-
-export const useAuthStore = createAuthStore();
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  isAuthenticated: false,
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+}));
 
 interface AppState {
   apps: App[];

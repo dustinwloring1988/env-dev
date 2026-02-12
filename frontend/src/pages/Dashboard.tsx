@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { appApi } from '../services/api';
 import { useAppStore, useAuthStore } from '../context/store';
 import { Button, Card } from '../components';
@@ -11,17 +11,24 @@ export const Dashboard: React.FC = () => {
   const [newAppName, setNewAppName] = useState('');
   const [newAppDescription, setNewAppDescription] = useState('');
   const [creating, setCreating] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const navigate = useNavigate();
 
   const { apps, setApps, addApp, removeApp } = useAppStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, setUser } = useAuthStore();
 
   useEffect(() => {
-    setHydrated(true);
-  }, []);
+    if (!isAuthenticated) {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        setUser({ id: '', email: '', createdAt: '' });
+      } else {
+        navigate('/login');
+      }
+    }
+  }, [isAuthenticated, navigate, setUser]);
 
   useEffect(() => {
-    if (!hydrated || !isAuthenticated) return;
+    if (!isAuthenticated) return;
 
     const fetchApps = async () => {
       try {
@@ -36,10 +43,28 @@ export const Dashboard: React.FC = () => {
     };
 
     fetchApps();
-  }, [hydrated, isAuthenticated, setApps]);
+  }, [isAuthenticated, setApps]);
 
-  if (!hydrated) {
-    return null;
+  if (!isAuthenticated) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      return (
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <h1 style={{ marginBottom: '1rem' }}>Welcome to env-dev</h1>
+          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+            A local development tool for managing app secrets and configurations.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <Link to="/login">
+              <Button>Login</Button>
+            </Link>
+            <Link to="/register">
+              <Button variant="secondary">Register</Button>
+            </Link>
+          </div>
+        </div>
+      );
+    }
   }
 
   const handleCreateApp = async (e: React.FormEvent) => {
